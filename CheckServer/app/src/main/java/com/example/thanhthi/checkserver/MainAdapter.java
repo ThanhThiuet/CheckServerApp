@@ -228,7 +228,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
                     BottomSheetMenuMain bottomSheetMenuMain = new BottomSheetMenuMain();
                     bottomSheetMenuMain.setSelectedItem(item);
-                    bottomSheetMenuMain.setPosition(position + 1);
+                    bottomSheetMenuMain.setPosition(position);
                     bottomSheetMenuMain.setSendDataToMainActivity(sendDataToMainActivity);
                     bottomSheetMenuMain.show(fragmentManager, bottomSheetMenuMain.getTag());
                     break;

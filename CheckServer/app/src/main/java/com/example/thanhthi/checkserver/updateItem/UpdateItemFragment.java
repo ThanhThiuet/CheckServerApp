@@ -1,6 +1,7 @@
 package com.example.thanhthi.checkserver.updateItem;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,16 +17,12 @@ import android.widget.TextView;
 import com.example.thanhthi.checkserver.R;
 import com.example.thanhthi.checkserver.SendDataToMainActivity;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
+import com.example.thanhthi.checkserver.services.CheckServerService;
 
 public class UpdateItemFragment extends Fragment implements View.OnClickListener
 {
-    public static final String FLAG = "flag";
     public static final String IS_CREATE = "create";
     public static final String IS_EDIT = "edit";
-
-    public static final String SELECTED_MODEL = "model";
-    public static final String SELECTED_POSITION = "position";
-
     private String flag;
 
     private TextView title;
@@ -69,6 +66,11 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
             case IS_EDIT:
             {
                 title.setText("Chỉnh sửa");
+                edtUrl.setText(selectedModel.getUrl());
+                edtKeyWord.setText(selectedModel.getKeyWord());
+                edtMessage.setText(selectedModel.getMessage());
+                edtFrequency.setText(selectedModel.getFrequency() + "");
+                switchCheck.setChecked(selectedModel.isChecking());
                 break;
             }
         }
@@ -83,9 +85,9 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         {
             case R.id.btnDone:
             {
-                String url = edtUrl.getText().toString();
-                String keyWord = edtKeyWord.getText().toString();
-                String message = edtMessage.getText().toString();
+                String url = edtUrl.getText().toString().trim();
+                String keyWord = edtKeyWord.getText().toString().trim();
+                String message = edtMessage.getText().toString().trim();
                 Float frequency = Float.parseFloat(edtFrequency.getText().toString());
 
                 selectedModel = new ItemCheckServer(url, keyWord, message, frequency, switchCheck.isChecked());
@@ -108,12 +110,16 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
     private void startCheckServer()
     {
         // start service
-        //...
+        Intent startIntent = new Intent(getActivity(), CheckServerService.class);
+        startIntent.putExtra(CheckServerService.INFOR_MODEL, selectedModel.toJson());
+        getActivity().startService(startIntent);
     }
 
     private void stopCheckServer()
     {
-
+        // stop service
+        Intent stopService = new Intent(getActivity(), CheckServerService.class);
+        getActivity().stopService(stopService);
     }
 
     private void updateItemListActivity()
@@ -127,7 +133,7 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
             }
             case IS_EDIT:
             {
-
+                sendDataToMainActivity.sendEditItem(selectedModel, position);
                 break;
             }
         }
