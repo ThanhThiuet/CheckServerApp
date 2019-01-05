@@ -1,8 +1,9 @@
 package com.example.thanhthi.checkserver;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 import com.example.thanhthi.checkserver.updateItem.EmptyViewHolder;
 import com.example.thanhthi.checkserver.updateItem.FooterViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -25,9 +27,57 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private int TYPE_FOOTER = 3;
 
     private List<ItemCheckServer> dataList;
+    private FragmentManager fragmentManager;
+    private SendDataToMainActivity sendDataToMainActivity;
 
-    public MainAdapter(List<ItemCheckServer> dataList) {
+    public MainAdapter(List<ItemCheckServer> dataList, FragmentManager fragmentManager, SendDataToMainActivity sendDataToMainActivity)
+    {
         this.dataList = dataList;
+        this.fragmentManager = fragmentManager;
+        this.sendDataToMainActivity = sendDataToMainActivity;
+    }
+
+    public void insertItem(ItemCheckServer model)
+    {
+        List<ItemCheckServer> newDataList = new ArrayList<>();
+        newDataList.addAll(dataList);
+        newDataList.add(0, model);
+
+        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
+        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
+
+        dataList = newDataList;
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    public void editItem(ItemCheckServer model, int position)
+    {
+        List<ItemCheckServer> newDataList = new ArrayList<>();
+        newDataList.addAll(dataList);
+        newDataList.set(position, model);
+
+        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
+        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
+
+        dataList = newDataList;
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    public void deleteItem(ItemCheckServer model)
+    {
+        List<ItemCheckServer> newDataList = new ArrayList<>();
+        newDataList.addAll(dataList);
+        newDataList.remove(model);
+
+        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
+        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
+
+        dataList = newDataList;
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    public List<ItemCheckServer> getDataList() {
+        return dataList;
     }
 
     @NonNull
@@ -70,7 +120,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         if (viewHolder instanceof ItemHolder)
         {
-            ItemCheckServer model = dataList.get(i);
+            ItemCheckServer model = dataList.get(i-1);
             ((ItemHolder) viewHolder).bind(model);
         }
     }
@@ -173,7 +223,14 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 }
                 case R.id.imgOptionMenu:
                 {
+                    int position = getAdapterPosition() - 1;
+                    ItemCheckServer item = dataList.get(position);
 
+                    BottomSheetMenuMain bottomSheetMenuMain = new BottomSheetMenuMain();
+                    bottomSheetMenuMain.setSelectedItem(item);
+                    bottomSheetMenuMain.setPosition(position + 1);
+                    bottomSheetMenuMain.setSendDataToMainActivity(sendDataToMainActivity);
+                    bottomSheetMenuMain.show(fragmentManager, bottomSheetMenuMain.getTag());
                     break;
                 }
             }

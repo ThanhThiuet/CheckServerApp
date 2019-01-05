@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.example.thanhthi.checkserver.data.local.ItemContract;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class ItemCheckServer
     private boolean isSelected = false;
     private static List<Integer> existIdList = new ArrayList<>();
 
-    public ItemCheckServer(String url, String keyWord, String message, int frequency)
+    public ItemCheckServer(String url, String keyWord, String message, float frequency)
     {
 //        setId();
         this.url = url;
@@ -30,7 +31,7 @@ public class ItemCheckServer
         isChecking = true;
     }
 
-    public ItemCheckServer(String url, String keyWord, String message, int frequency, boolean isChecking)
+    public ItemCheckServer(String url, String keyWord, String message, float frequency, boolean isChecking)
     {
 //        setId();
         this.url = url;
@@ -131,6 +132,18 @@ public class ItemCheckServer
         }
 
         return contentValues;
+    }
+
+    public static ItemCheckServer initialize(String jsonGSON)
+    {
+        Gson gson = new Gson();
+        return gson.fromJson(jsonGSON, ItemCheckServer.class);
+    }
+
+    public String toJson()
+    {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
     private void setId()
