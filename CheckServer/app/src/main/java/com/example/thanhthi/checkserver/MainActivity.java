@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -101,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         if (repository.insertItem(item))
         {
+            Log.e("ADD_ITEM_SUCCESS", item.getId() + "");
             adapter.insertItem(item);
             dataList = adapter.getDataList();
             recyclerView.scrollToPosition(0);
@@ -118,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         if (repository.editItem(item))
         {
+            Log.e("EDIT_ITEM_SUCCESS", item.getId() + "");
             adapter.editItem(item, position);
             dataList = adapter.getDataList();
             Toast.makeText(this, "Sửa item thành công!", Toast.LENGTH_SHORT).show();
@@ -134,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         if (repository.deleteItem(item))
         {
+            Log.e("DELETE_ITEM_SUCCESS", item.getId() + "");
             adapter.deleteItem(item);
             dataList = adapter.getDataList();
             Toast.makeText(this, "Xóa item thành công!", Toast.LENGTH_SHORT).show();
@@ -164,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         Intent startIntent = new Intent(getBaseContext(), CheckServerService.class);
         startIntent.setFlags(model.getId());
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationHelper.requestCode + 1, startIntent, model.getId());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), model.getId(), startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
 

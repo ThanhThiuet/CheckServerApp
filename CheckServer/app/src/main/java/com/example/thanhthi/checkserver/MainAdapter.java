@@ -61,15 +61,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void editItem(ItemCheckServer model, int position)
     {
-        List<ItemCheckServer> newDataList = new ArrayList<>();
-        newDataList.addAll(dataList);
-        newDataList.set(position, model);
-
-        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
-        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-
-        dataList = newDataList;
-        diffResult.dispatchUpdatesTo(this);
+        dataList.set(position, model);
+        notifyDataSetChanged();
     }
 
     public void deleteItem(ItemCheckServer model)
