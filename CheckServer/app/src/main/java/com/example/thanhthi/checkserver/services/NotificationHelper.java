@@ -1,6 +1,5 @@
 package com.example.thanhthi.checkserver.services;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -18,8 +17,7 @@ import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 public class NotificationHelper
 {
     public static final String NOTIFICATION_CHANNEL_ID = "1000";
-
-    private int requestCode = 0;
+    public static final int requestCode = 0;
 
     private Context context;
     private NotificationManager notificationManager;

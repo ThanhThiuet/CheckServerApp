@@ -1,6 +1,10 @@
 package com.example.thanhthi.checkserver;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.util.DiffUtil;
@@ -13,10 +17,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
+import com.example.thanhthi.checkserver.services.CheckServerService;
+import com.example.thanhthi.checkserver.services.NotificationHelper;
 import com.example.thanhthi.checkserver.updateItem.EmptyViewHolder;
 import com.example.thanhthi.checkserver.updateItem.FooterViewHolder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
@@ -26,12 +33,14 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private int TYPE_ITEM = 2;
     private int TYPE_FOOTER = 3;
 
+    private Context context;
     private List<ItemCheckServer> dataList;
     private FragmentManager fragmentManager;
     private SendDataToMainActivity sendDataToMainActivity;
 
-    public MainAdapter(List<ItemCheckServer> dataList, FragmentManager fragmentManager, SendDataToMainActivity sendDataToMainActivity)
+    public MainAdapter(Context context, List<ItemCheckServer> dataList, FragmentManager fragmentManager, SendDataToMainActivity sendDataToMainActivity)
     {
+        this.context = context;
         this.dataList = dataList;
         this.fragmentManager = fragmentManager;
         this.sendDataToMainActivity = sendDataToMainActivity;
@@ -203,10 +212,12 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             textMessage.setText(model.getMessage());
             textFrequency.setText(model.getFrequency() + "");
 
-            if (model.isChecking())
+            if (model.isChecking()) {
                 textState.setText("Có");
-            else
+            }
+            else {
                 textState.setText("Không");
+            }
 
             imgSelected.setVisibility(View.GONE);
         }

@@ -18,7 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper
             + ItemContract.ItemEntry.COLUMN_FREQUENCY + " REAL, "
             + ItemContract.ItemEntry.COLUMN_IS_CHECKING + " INTEGER DEFAULT 0)";  // for boolean
 
-    private static final String SQL_DELETE_ITEMS = "DROP TABLE IF EXISTS"
+    private static final String SQL_DELETE_ITEMS = "DROP TABLE "
             + ItemContract.ItemEntry.TABLE_NAME;
 
     public DatabaseHelper(Context context) {

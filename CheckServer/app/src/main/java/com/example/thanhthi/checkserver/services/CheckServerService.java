@@ -1,20 +1,14 @@
 package com.example.thanhthi.checkserver.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.thanhthi.checkserver.MainActivity;
-import com.example.thanhthi.checkserver.R;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 
 import org.apache.http.HttpResponse;
@@ -49,28 +43,14 @@ public class CheckServerService extends Service
         String modelString = bundle.getString(INFOR_MODEL, "");
         model = ItemCheckServer.initialize(modelString);
 
-        GetContentAsyntask asyntask = new GetContentAsyntask();
-
-        while (model.isChecking())
-        {
-            asyntask.execute();
-
-            long timeSleep = (long) (1000 * 60 * model.getFrequency());
-            try {
-                Thread.sleep(timeSleep);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        Toast.makeText(this, "Starting service " + model.getId(), Toast.LENGTH_SHORT).show();
+        new GetContentAsyntask().execute();
         return START_STICKY;
     }
 
     @Override
     public void onDestroy()
     {
-        Toast.makeText(getApplicationContext(), "Stop service " + model.getId() + " success.", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Stop service " + model.getId() + " success.", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 
@@ -108,7 +88,16 @@ public class CheckServerService extends Service
         {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet("https://" + model.getUrl());
-            HttpResponse response = client.execute(request);
+
+            HttpResponse response = null;
+            try {
+                response = client.execute(request);
+            }
+            catch (Exception e) {
+                Log.e("HTTP-GET", e.getMessage());
+            }
+            if (response == null) return "";
+
 
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
