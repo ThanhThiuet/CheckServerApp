@@ -2,7 +2,6 @@ package com.example.thanhthi.checkserver;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.content.Intent;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;

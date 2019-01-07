@@ -1,22 +1,16 @@
 package com.example.thanhthi.checkserver.services;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.thanhthi.checkserver.MainActivity;
-import com.example.thanhthi.checkserver.R;
+import com.example.thanhthi.checkserver.data.ItemDataSource;
+import com.example.thanhthi.checkserver.data.ItemRepository;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 
 import org.apache.http.HttpResponse;
@@ -28,20 +22,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CheckServerService extends Service {
-    public static final String INFOR_MODEL = "info_model";
+public class CheckServerService extends Service
+{
+    public static final String DATA = "data";
 
     private ItemCheckServer model;
-    private boolean isContained;
-
-//    private NotificationManager notificationManager = null;
-//    private int NOTIFICATION = 1; // Unique identifier for our notification
 
     @Nullable
     @Override
@@ -50,72 +39,52 @@ public class CheckServerService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        isContained = false;
-//        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        super.onCreate();
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Bundle bundle = intent.getExtras();
-        String modelString = bundle.getString(INFOR_MODEL, "");
-        model = ItemCheckServer.initialize(modelString);
+        ItemDataSource repository = ItemRepository.getInstance(getApplicationContext());
+        List<ItemCheckServer> dataList = repository.getAllItems();
 
-        final long timeSleep = (long) (1000 * 60 * model.getFrequency());
+        int idSelected = intent.getFlags();
 
-        GetContentAsyntask asyntask = new GetContentAsyntask();
-        asyntask.execute();
+        for (ItemCheckServer item : dataList)
+        {
+            if (idSelected == item.getId())
+            {
+                model = item;
+                break;
+            }
+        }
 
-        Toast.makeText(this, "Starting service " + model.getId(), Toast.LENGTH_SHORT).show();
-//        Toast.makeText(this, "Nội dung: " + content, Toast.LENGTH_SHORT).show();
+        if (model != null && model.isChecking())
+            new GetContentAsyntask().execute();
+        else
+            stopSelf();
 
-        //notify
-//        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
-//        Notification notification = new NotificationCompat.Builder(this)
-//                .setSmallIcon(R.mipmap.ic_launcher) // the status icon
-//                .setTicker("Service running...") // the status text
-//                .setWhen(System.currentTimeMillis()) // the time stamp
-//                .setContentTitle("My App") // the label of the entry
-//                .setContentText("Service running...") // the content of the entry
-//                .setContentIntent(contentIntent) // the intent to send when the entry is clicked
-//                .setOngoing(true) // make persistent (disable swipe-away)
-//                .build();
-//        // Start service in foreground mode
-//        startForeground(NOTIFICATION, notification);
         return START_STICKY;
     }
 
-    @Override
-    public void onDestroy()
-    {
-        Toast.makeText(getApplicationContext(), "Stop service " + model.getId() + " success.", Toast.LENGTH_SHORT).show();
-//        notificationManager.cancel(NOTIFICATION); // Remove notification
-        super.onDestroy();
-    }
-
-    private final class GetContentAsyntask extends AsyncTask<Void, Void, Void>
+    private final class GetContentAsyntask extends AsyncTask<Void, Void, Boolean>
     {
         @Override
-        protected Void doInBackground(Void... voids)
+        protected Boolean doInBackground(Void... voids)
         {
             // get content from url
             String content = "";
-            try {
+            try
+            {
                 content = getContentHtml();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            Log.e("SHOW-CONTENT", content);
+            Log.e("CONTENT", content);
             if (content.isEmpty()) return null;
 
+            // check keyword in content url
             List<String> keyWordList = new ArrayList<>(Arrays.asList(model.getKeyWord().split(";")));
 
+            boolean isContained = false;
             for (String keyWord : keyWordList)
             {
-                Log.e("KEY-WORD-ILIMENT", keyWord);
                 if (content.contains(keyWord))
                 {
                     isContained = true;
@@ -123,27 +92,43 @@ public class CheckServerService extends Service {
                     break;
                 }
             }
-
-            return null;
+            return isContained;
         }
 
         private String getContentHtml() throws IOException
         {
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet("https://" + model.getUrl());
-            HttpResponse response = client.execute(request);
+
+            HttpResponse response = null;
+            try {
+                response = client.execute(request);
+            }
+            catch (Exception e) {
+                Log.e("HTTP-GET", e.getMessage());
+            }
+            if (response == null) return "";
+
 
             InputStream in = response.getEntity().getContent();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder str = new StringBuilder();
             String line = null;
-            while((line = reader.readLine()) != null)
-            {
+            while((line = reader.readLine()) != null) {
                 str.append(line);
             }
             in.close();
-            Log.e("HTTP-GET", str.toString());
+
             return str.toString();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean aBoolean)
+        {
+            // show notify
+            NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext(), model);
+            notificationHelper.createNotification();
+            super.onPostExecute(aBoolean);
         }
     }
 }

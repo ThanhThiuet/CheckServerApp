@@ -1,6 +1,9 @@
 package com.example.thanhthi.checkserver.updateItem;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,6 +21,9 @@ import com.example.thanhthi.checkserver.R;
 import com.example.thanhthi.checkserver.SendDataToMainActivity;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 import com.example.thanhthi.checkserver.services.CheckServerService;
+import com.example.thanhthi.checkserver.services.NotificationHelper;
+
+import java.util.Calendar;
 
 public class UpdateItemFragment extends Fragment implements View.OnClickListener
 {
@@ -85,58 +91,41 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         {
             case R.id.btnDone:
             {
-                String url = edtUrl.getText().toString().trim();
-                String keyWord = edtKeyWord.getText().toString().trim();
-                String message = edtMessage.getText().toString().trim();
-                Float frequency = Float.parseFloat(edtFrequency.getText().toString());
-
-                selectedModel = new ItemCheckServer(url, keyWord, message, frequency, switchCheck.isChecked());
-
-                checkSwitch();
                 updateItemListActivity();
                 break;
             }
         }
     }
 
-    private void checkSwitch()
-    {
-        if (switchCheck.isChecked())
-            startCheckServer();
-        else
-            stopCheckServer();
-    }
-
-    private void startCheckServer()
-    {
-        // start service
-        Intent startIntent = new Intent(getActivity(), CheckServerService.class);
-        startIntent.putExtra(CheckServerService.INFOR_MODEL, selectedModel.toJson());
-        getActivity().startService(startIntent);
-    }
-
-    private void stopCheckServer()
-    {
-        // stop service
-        Intent stopService = new Intent(getActivity(), CheckServerService.class);
-        getActivity().stopService(stopService);
-    }
-
     private void updateItemListActivity()
     {
+        String url = edtUrl.getText().toString().trim();
+        String keyWord = edtKeyWord.getText().toString().trim();
+        String message = edtMessage.getText().toString().trim();
+        Float frequency = Float.parseFloat(edtFrequency.getText().toString().trim());
+
         switch(flag)
         {
             case IS_CREATE:
             {
+                selectedModel = new ItemCheckServer(url, keyWord, message, frequency, switchCheck.isChecked());
+
                 sendDataToMainActivity.sendNewItem(selectedModel);
                 break;
             }
             case IS_EDIT:
             {
+                selectedModel.setUrl(url);
+                selectedModel.setKeyWord(keyWord);
+                selectedModel.setMessage(message);
+                selectedModel.setFrequency(frequency);
+                selectedModel.setChecking(switchCheck.isChecked());
+
                 sendDataToMainActivity.sendEditItem(selectedModel, position);
                 break;
             }
         }
+
         getActivity().onBackPressed();
     }
 

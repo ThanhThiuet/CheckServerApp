@@ -1,5 +1,8 @@
 package com.example.thanhthi.checkserver;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -13,14 +16,15 @@ import android.widget.Toast;
 import com.example.thanhthi.checkserver.data.ItemDataSource;
 import com.example.thanhthi.checkserver.data.ItemRepository;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
+import com.example.thanhthi.checkserver.services.CheckServerService;
+import com.example.thanhthi.checkserver.services.NotificationHelper;
 import com.example.thanhthi.checkserver.updateItem.UpdateItemFragment;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SendDataToMainActivity
 {
-    public static final String SEND_INTERFACE = "interface";
-
     private RecyclerView recyclerView;
     private MainAdapter adapter;
 
@@ -42,20 +46,21 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         setTitle("Check Server");
         recyclerView = findViewById(R.id.recyclerView);
 
-        if (adapter == null)
-        {
-            adapter = new MainAdapter(dataList, getSupportFragmentManager(),this);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setAdapter(adapter);
-        }
+        adapter = new MainAdapter(getApplicationContext(), dataList, getSupportFragmentManager(),this);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     private void getData()
     {
         repository = ItemRepository.getInstance(this);
         dataList = repository.getAllItems();
+
+        for (ItemCheckServer item : dataList) {
+            checkToStartService(item);
+        }
     }
 
     @Override
@@ -100,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             dataList = adapter.getDataList();
             recyclerView.scrollToPosition(0);
             Toast.makeText(this, "Thêm item thành công!", Toast.LENGTH_SHORT).show();
+            checkToStartService(item);
         }
         else
         {
@@ -115,12 +121,12 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             adapter.editItem(item, position);
             dataList = adapter.getDataList();
             Toast.makeText(this, "Sửa item thành công!", Toast.LENGTH_SHORT).show();
+            checkToStartService(item);
         }
         else
         {
             Toast.makeText(this, "Sửa item không thành công!", Toast.LENGTH_SHORT).show();
         }
-        recyclerView.scrollToPosition(position);
     }
 
     @Override
@@ -137,5 +143,39 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             Toast.makeText(this, "Xóa item không thành công!", Toast.LENGTH_SHORT).show();
         }
         recyclerView.scrollToPosition(position);
+    }
+
+    private void checkToStartService(ItemCheckServer model)
+    {
+        if (model.isChecking())
+            startCheckServer(model);
+        else
+            stopCheckServer(model);
+    }
+
+    private void startCheckServer(ItemCheckServer model)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+
+        long timeRepeat = (long) (1000 * 60 * model.getFrequency());
+
+        // start service
+        Intent startIntent = new Intent(getBaseContext(), CheckServerService.class);
+        startIntent.setFlags(model.getId());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationHelper.requestCode + 1, startIntent, model.getId());
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
+
+        startService(startIntent);
+    }
+
+    private void stopCheckServer(ItemCheckServer model)
+    {
+        // stop service
+        Intent stopIntent = new Intent(getApplicationContext(), CheckServerService.class);
+        stopIntent.setFlags(model.getId());
+        stopService(stopIntent);
     }
 }

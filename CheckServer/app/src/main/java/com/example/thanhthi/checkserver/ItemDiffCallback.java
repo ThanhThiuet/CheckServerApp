@@ -32,7 +32,12 @@ public class ItemDiffCallback extends DiffUtil.Callback
     }
 
     @Override
-    public boolean areContentsTheSame(int i, int i1) {
-        return oldDataList.get(i).equals(newDataList.get(i1));
+    public boolean areContentsTheSame(int i, int i1) 
+    {
+        return oldDataList.get(i).getUrl().equals(newDataList.get(i1).getUrl())
+                && oldDataList.get(i).getKeyWord().equals(newDataList.get(i1).getKeyWord())
+                && oldDataList.get(i).getMessage().equals(newDataList.get(i1).getMessage())
+                && oldDataList.get(i).getFrequency() == newDataList.get(i1).getFrequency()
+                && oldDataList.get(i).isChecking() == newDataList.get(i1).isChecking();
     }
 }
