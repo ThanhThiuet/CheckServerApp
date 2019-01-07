@@ -43,7 +43,10 @@ public class CheckServerService extends Service
         String modelString = bundle.getString(INFOR_MODEL, "");
         model = ItemCheckServer.initialize(modelString);
 
-        new GetContentAsyntask().execute();
+        if (model.isChecking())
+            new GetContentAsyntask().execute();
+        else
+            stopSelf(startId);
         return START_STICKY;
     }
 

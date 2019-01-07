@@ -17,7 +17,7 @@ public class ItemCheckServer
     private String keyWord;
     private String message;
     private float frequency;
-    private boolean isChecking;
+    private boolean isChecking = false;
     private boolean isSelected = false;
     private static List<Integer> existIdList = new ArrayList<>();
 

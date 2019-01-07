@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             dataList = adapter.getDataList();
             recyclerView.scrollToPosition(0);
             Toast.makeText(this, "Thêm item thành công!", Toast.LENGTH_SHORT).show();
-//            checkToStartService(item);
+            checkToStartService(item);
         }
         else
         {
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             adapter.editItem(item, position);
             dataList = adapter.getDataList();
             Toast.makeText(this, "Sửa item thành công!", Toast.LENGTH_SHORT).show();
-//            checkToStartService(item);
+            checkToStartService(item);
         }
         else
         {
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         if (model.isChecking())
             startCheckServer(model);
         else
-            stopCheckServer();
+            stopCheckServer(model);
 
 //        startCheckServer(model);
     }
@@ -169,17 +169,19 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         // start service
         Intent startIntent = new Intent(getApplicationContext(), CheckServerService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), NotificationHelper.requestCode, startIntent, 0);
+
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), NotificationHelper.requestCode, startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
+
         startIntent.putExtra(CheckServerService.INFOR_MODEL, model.toJson());
         startService(startIntent);
     }
 
-    private void stopCheckServer()
+    private void stopCheckServer(ItemCheckServer model)
     {
         // stop service
-        Intent stopService = new Intent(getApplicationContext(), CheckServerService.class);
-        stopService(stopService);
+        Intent stopIntent = new Intent(getApplicationContext(), CheckServerService.class);
+        stopService(stopIntent);
     }
 }
