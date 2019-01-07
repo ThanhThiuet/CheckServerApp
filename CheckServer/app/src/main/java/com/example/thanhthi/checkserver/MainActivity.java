@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         {
             Toast.makeText(this, "Sửa item không thành công!", Toast.LENGTH_SHORT).show();
         }
-        recyclerView.scrollToPosition(position);
     }
 
     @Override
