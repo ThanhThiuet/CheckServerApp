@@ -91,22 +91,6 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         {
             case R.id.btnDone:
             {
-                String url = edtUrl.getText().toString().trim();
-                String keyWord = edtKeyWord.getText().toString().trim();
-                String message = edtMessage.getText().toString().trim();
-                Float frequency = Float.parseFloat(edtFrequency.getText().toString().trim());
-
-                if (selectedModel == null)
-                    selectedModel = new ItemCheckServer(url, keyWord, message, frequency, switchCheck.isChecked());
-                else
-                {
-                    selectedModel.setUrl(url);
-                    selectedModel.setKeyWord(keyWord);
-                    selectedModel.setMessage(message);
-                    selectedModel.setFrequency(frequency);
-                    selectedModel.setChecking(switchCheck.isChecked());
-                }
-
                 updateItemListActivity();
                 break;
             }
@@ -115,19 +99,33 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
 
     private void updateItemListActivity()
     {
+        String url = edtUrl.getText().toString().trim();
+        String keyWord = edtKeyWord.getText().toString().trim();
+        String message = edtMessage.getText().toString().trim();
+        Float frequency = Float.parseFloat(edtFrequency.getText().toString().trim());
+
         switch(flag)
         {
             case IS_CREATE:
             {
+                selectedModel = new ItemCheckServer(url, keyWord, message, frequency, switchCheck.isChecked());
+
                 sendDataToMainActivity.sendNewItem(selectedModel);
                 break;
             }
             case IS_EDIT:
             {
+                selectedModel.setUrl(url);
+                selectedModel.setKeyWord(keyWord);
+                selectedModel.setMessage(message);
+                selectedModel.setFrequency(frequency);
+                selectedModel.setChecking(switchCheck.isChecked());
+
                 sendDataToMainActivity.sendEditItem(selectedModel, position);
                 break;
             }
         }
+
         getActivity().onBackPressed();
     }
 

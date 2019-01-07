@@ -9,6 +9,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.thanhthi.checkserver.data.ItemDataSource;
+import com.example.thanhthi.checkserver.data.ItemRepository;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 
 import org.apache.http.HttpResponse;
@@ -26,7 +28,7 @@ import java.util.List;
 
 public class CheckServerService extends Service
 {
-    public static final String INFOR_MODEL = "info_model";
+    public static final String DATA = "data";
 
     private ItemCheckServer model;
 
@@ -39,22 +41,26 @@ public class CheckServerService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Bundle bundle = intent.getExtras();
-        String modelString = bundle.getString(INFOR_MODEL, "");
-        model = ItemCheckServer.initialize(modelString);
+        ItemDataSource repository = ItemRepository.getInstance(getApplicationContext());
+        List<ItemCheckServer> dataList = repository.getAllItems();
 
-        if (model.isChecking())
+        int idSelected = intent.getFlags();
+
+        for (ItemCheckServer item : dataList)
+        {
+            if (idSelected == item.getId())
+            {
+                model = item;
+                break;
+            }
+        }
+
+        if (model != null && model.isChecking())
             new GetContentAsyntask().execute();
         else
-            stopSelf(startId);
-        return START_STICKY;
-    }
+            stopSelf();
 
-    @Override
-    public void onDestroy()
-    {
-//        Toast.makeText(getApplicationContext(), "Stop service " + model.getId() + " success.", Toast.LENGTH_SHORT).show();
-        super.onDestroy();
+        return START_STICKY;
     }
 
     private final class GetContentAsyntask extends AsyncTask<Void, Void, Boolean>
@@ -64,11 +70,13 @@ public class CheckServerService extends Service
         {
             // get content from url
             String content = "";
-            try {
+            try
+            {
                 content = getContentHtml();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            Log.e("CONTENT", content);
             if (content.isEmpty()) return null;
 
             // check keyword in content url

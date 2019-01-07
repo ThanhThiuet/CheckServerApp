@@ -41,15 +41,6 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         initView();
     }
 
-    @Override
-    protected void onResume()
-    {
-        for (ItemCheckServer item : dataList) {
-            checkToStartService(item);
-        }
-        super.onResume();
-    }
-
     private void initView()
     {
         setTitle("Check Server");
@@ -66,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         repository = ItemRepository.getInstance(this);
         dataList = repository.getAllItems();
+
+        for (ItemCheckServer item : dataList) {
+            checkToStartService(item);
+        }
     }
 
     @Override
@@ -156,8 +151,6 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             startCheckServer(model);
         else
             stopCheckServer(model);
-
-//        startCheckServer(model);
     }
 
     private void startCheckServer(ItemCheckServer model)
@@ -168,13 +161,13 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         long timeRepeat = (long) (1000 * 60 * model.getFrequency());
 
         // start service
-        Intent startIntent = new Intent(getApplicationContext(), CheckServerService.class);
+        Intent startIntent = new Intent(getBaseContext(), CheckServerService.class);
+        startIntent.setFlags(model.getId());
 
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), NotificationHelper.requestCode, startIntent, model.getId());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), NotificationHelper.requestCode + 1, startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
 
-        startIntent.putExtra(CheckServerService.INFOR_MODEL, model.toJson());
         startService(startIntent);
     }
 
@@ -182,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         // stop service
         Intent stopIntent = new Intent(getApplicationContext(), CheckServerService.class);
+        stopIntent.setFlags(model.getId());
         stopService(stopIntent);
     }
 }
