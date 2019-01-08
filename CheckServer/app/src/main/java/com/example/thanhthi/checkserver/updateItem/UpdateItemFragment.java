@@ -66,12 +66,12 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         {
             case IS_CREATE:
             {
-                title.setText("Tạo mới");
+                title.setText("Create new item");
                 break;
             }
             case IS_EDIT:
             {
-                title.setText("Chỉnh sửa");
+                title.setText("Edit item");
                 edtUrl.setText(selectedModel.getUrl());
                 edtKeyWord.setText(selectedModel.getKeyWord());
                 edtMessage.setText(selectedModel.getMessage());
@@ -102,7 +102,7 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         String url = edtUrl.getText().toString().trim();
         String keyWord = edtKeyWord.getText().toString().trim();
         String message = edtMessage.getText().toString().trim();
-        Float frequency = Float.parseFloat(edtFrequency.getText().toString().trim());
+        Double frequency = Double.parseDouble(edtFrequency.getText().toString().trim());
 
         switch(flag)
         {

@@ -81,7 +81,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Từ khóa: "
+                        android:text="Key word: "
                         android:textColor="@color/blackThin" />
 
                     <TextView
@@ -103,7 +103,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Thông báo: "
+                        android:text="Message: "
                         android:textColor="@color/blackThin" />
 
                     <TextView
@@ -125,7 +125,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tần suất (phút): "
+                        android:text="Frequency (minute): "
                         android:textColor="@color/blackThin" />
 
                     <TextView
@@ -147,14 +147,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Đang check: "
+                        android:text="Is checking: "
                         android:textColor="@color/blackThin" />
 
                     <TextView
                         android:id="@+id/textState"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Không"
+                        android:text="No"
                         android:textColor="@color/blackThin" />
 
                 </LinearLayout>

@@ -34,8 +34,9 @@ public class NotificationHelper
     {
         Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.setFlags(item.getId());
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, item.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.mipmap.ic_launcher);
@@ -57,11 +58,12 @@ public class NotificationHelper
             notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             assert notificationManager != null;
-            builder.setChannelId(NOTIFICATION_CHANNEL_ID);
+//            builder.setChannelId(NOTIFICATION_CHANNEL_ID);
+            builder.setChannelId(item.getId() + "");
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
         assert notificationManager != null;
-        notificationManager.notify(requestCode, builder.build());
+        notificationManager.notify(item.getId(), builder.build());
     }
 }

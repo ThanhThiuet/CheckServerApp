@@ -16,14 +16,12 @@ public class ItemCheckServer
     private String url;
     private String keyWord;
     private String message;
-    private float frequency;
+    private double frequency;
     private boolean isChecking = false;
     private boolean isSelected = false;
-    private static List<Integer> existIdList = new ArrayList<>();
 
-    public ItemCheckServer(String url, String keyWord, String message, float frequency)
+    public ItemCheckServer(String url, String keyWord, String message, double frequency)
     {
-//        setId();
         this.url = url;
         this.keyWord = keyWord;
         this.message = message;
@@ -31,9 +29,8 @@ public class ItemCheckServer
         isChecking = true;
     }
 
-    public ItemCheckServer(String url, String keyWord, String message, float frequency, boolean isChecking)
+    public ItemCheckServer(String url, String keyWord, String message, double frequency, boolean isChecking)
     {
-//        setId();
         this.url = url;
         this.keyWord = keyWord;
         this.message = message;
@@ -79,11 +76,11 @@ public class ItemCheckServer
         this.message = message;
     }
 
-    public float getFrequency() {
+    public double getFrequency() {
         return frequency;
     }
 
-    public void setFrequency(float frequency) {
+    public void setFrequency(double frequency) {
         this.frequency = frequency;
     }
 
@@ -107,10 +104,6 @@ public class ItemCheckServer
     {
         ContentValues contentValues = new ContentValues();
 
-//        if (id != 0) {
-//            contentValues.put(ItemContract.ItemEntry._ID, id);
-//        }
-
         if (url != null) {
             contentValues.put(ItemContract.ItemEntry.COLUMN_URL, url);
         }
@@ -132,41 +125,5 @@ public class ItemCheckServer
         }
 
         return contentValues;
-    }
-
-    public static ItemCheckServer initialize(String jsonGSON)
-    {
-        Gson gson = new Gson();
-        return gson.fromJson(jsonGSON, ItemCheckServer.class);
-    }
-
-    public String toJson()
-    {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
-    private void setId()
-    {
-        //random id
-        Random rd = new Random();
-        int randomId = 1 + rd.nextInt(100);
-
-        boolean existed = false;
-        if (existIdList.size() > 0)
-        {
-            for (int i : existIdList)
-            {
-                if (i == randomId)
-                {
-                    existed = true;
-                    break;
-                }
-            }
-        }
-        if (existed) setId();
-
-        existIdList.add(randomId);
-        id = randomId;
     }
 }

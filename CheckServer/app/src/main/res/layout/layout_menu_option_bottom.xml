@@ -5,6 +5,34 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/icon_info_gray" />
+
+        <TextView
+            android:id="@+id/nameItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:text="Item "
+            android:textColor="#000" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/gray" />
+
+    <LinearLayout
         android:id="@+id/editOption"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -22,15 +50,10 @@
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:text="Chỉnh sửa"
+            android:text="Edit"
             android:textColor="#000" />
 
     </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1px"
-        android:background="@color/gray" />
 
     <LinearLayout
         android:id="@+id/deleteOption"
@@ -50,7 +73,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
-            android:text="Xóa"
+            android:text="Delete"
             android:textColor="#000" />
 
     </LinearLayout>

@@ -48,15 +48,9 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void insertItem(ItemCheckServer model)
     {
-        List<ItemCheckServer> newDataList = new ArrayList<>();
-        newDataList.addAll(dataList);
-        newDataList.add(0, model);
-
-        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
-        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-
-        dataList = newDataList;
-        diffResult.dispatchUpdatesTo(this);
+        dataList.add(model);
+        notifyDataSetChanged();
+        notifyItemRangeInserted(0, dataList.size());
     }
 
     public void editItem(ItemCheckServer model, int position)
@@ -67,15 +61,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void deleteItem(ItemCheckServer model)
     {
-        List<ItemCheckServer> newDataList = new ArrayList<>();
-        newDataList.addAll(dataList);
-        newDataList.remove(model);
-
-        final ItemDiffCallback diffCallback = new ItemDiffCallback(dataList, newDataList);
-        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
-
-        dataList = newDataList;
-        diffResult.dispatchUpdatesTo(this);
+        dataList.remove(model);
+        notifyDataSetChanged();
     }
 
     public List<ItemCheckServer> getDataList() {
@@ -206,10 +193,10 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             textFrequency.setText(model.getFrequency() + "");
 
             if (model.isChecking()) {
-                textState.setText("Có");
+                textState.setText("Yes");
             }
             else {
-                textState.setText("Không");
+                textState.setText("No");
             }
 
             imgSelected.setVisibility(View.GONE);

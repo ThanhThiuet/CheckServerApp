@@ -6,6 +6,7 @@ import android.support.design.widget.BottomSheetDialogFragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 import com.example.thanhthi.checkserver.updateItem.UpdateItemFragment;
@@ -15,6 +16,7 @@ import com.example.thanhthi.checkserver.utilities.OnConfirmDialogAction;
 public class BottomSheetMenuMain extends BottomSheetDialogFragment implements View.OnClickListener
 {
     private LinearLayout editOption, deleteOption;
+    private TextView nameItem;
 
     private ItemCheckServer selectedItem;
     private int position = -1;
@@ -30,10 +32,14 @@ public class BottomSheetMenuMain extends BottomSheetDialogFragment implements Vi
         dialog.setContentView(view);
     }
 
+    @SuppressLint("SetTextI18n")
     private void initView(View view)
     {
         editOption = view.findViewById(R.id.editOption);
         deleteOption = view.findViewById(R.id.deleteOption);
+        nameItem = view.findViewById(R.id.nameItem);
+
+        nameItem.setText("Item " + selectedItem.getId());
 
         editOption.setOnClickListener(this);
         deleteOption.setOnClickListener(this);
@@ -75,9 +81,10 @@ public class BottomSheetMenuMain extends BottomSheetDialogFragment implements Vi
 
     private void deleteSelectedItem()
     {
-        String title = "Bạn có muốn xóa item này không?";
+        String title = "Do you want to delete item " + selectedItem.getId() + "?";
 
-        ConfirmDialog.initialize(title, new OnConfirmDialogAction() {
+        ConfirmDialog.initialize(title, new OnConfirmDialogAction()
+        {
             @Override
             public void onCancel() {}
 

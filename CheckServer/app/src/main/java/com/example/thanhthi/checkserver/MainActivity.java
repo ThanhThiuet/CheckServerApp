@@ -21,6 +21,7 @@ import com.example.thanhthi.checkserver.services.CheckServerService;
 import com.example.thanhthi.checkserver.services.NotificationHelper;
 import com.example.thanhthi.checkserver.updateItem.UpdateItemFragment;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         getData();
         initView();
+        startServiceFirst();
     }
 
     private void initView()
@@ -58,6 +60,12 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         repository = ItemRepository.getInstance(this);
         dataList = repository.getAllItems();
+        if (dataList == null) dataList = new ArrayList<>();
+    }
+
+    private void startServiceFirst()
+    {
+        if (dataList.isEmpty()) return;
 
         for (ItemCheckServer item : dataList) {
             checkToStartService(item);
@@ -102,11 +110,15 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     {
         if (repository.insertItem(item))
         {
+            int position = repository.getAllItems().size() - 1;
+            item = repository.getAllItems().get(position);
             Log.e("ADD_ITEM_SUCCESS", item.getId() + "");
+
             adapter.insertItem(item);
             dataList = adapter.getDataList();
-            recyclerView.scrollToPosition(0);
-            Toast.makeText(this, "Thêm item thành công!", Toast.LENGTH_SHORT).show();
+            recyclerView.scrollToPosition(position + 1);
+
+            Toast.makeText(this, "Thêm item " + item.getId() + " thành công!", Toast.LENGTH_SHORT).show();
             checkToStartService(item);
         }
         else
@@ -123,12 +135,12 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             Log.e("EDIT_ITEM_SUCCESS", item.getId() + "");
             adapter.editItem(item, position);
             dataList = adapter.getDataList();
-            Toast.makeText(this, "Sửa item thành công!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sửa item " + item.getId() + " thành công!", Toast.LENGTH_SHORT).show();
             checkToStartService(item);
         }
         else
         {
-            Toast.makeText(this, "Sửa item không thành công!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Sửa item " + item.getId() + " không thành công!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -140,11 +152,11 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             Log.e("DELETE_ITEM_SUCCESS", item.getId() + "");
             adapter.deleteItem(item);
             dataList = adapter.getDataList();
-            Toast.makeText(this, "Xóa item thành công!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Xóa item " + item.getId() + " thành công!", Toast.LENGTH_SHORT).show();
         }
         else
         {
-            Toast.makeText(this, "Xóa item không thành công!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Xóa item " + item.getId() + " không thành công!", Toast.LENGTH_SHORT).show();
         }
         recyclerView.scrollToPosition(position);
     }
@@ -171,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), model.getId(), startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
+//        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), timeRepeat, pendingIntent);
 
         startService(startIntent);
     }
