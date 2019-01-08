@@ -202,20 +202,28 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
     private void stopCheckServer(ItemCheckServer model)
     {
+
+        CheckServerService.repository = this.repository;
+
         // stop service
         Intent stopIntent = new Intent(getApplicationContext(), CheckServerService.class);
         stopIntent.setFlags(model.getId());
         stopService(stopIntent);
-
-        CheckServerService.repository = this.repository;
     }
 
     @Override
     protected void onDestroy()
     {
+        for (ItemCheckServer item : dataList)
+        {
+            item.setChecking(false);
+            repository.editItem(item);
+        }
+
         for (ItemCheckServer item : dataList) {
             stopCheckServer(item);
         }
+
         super.onDestroy();
     }
 }
