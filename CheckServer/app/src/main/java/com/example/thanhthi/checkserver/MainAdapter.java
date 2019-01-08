@@ -46,6 +46,13 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.sendDataToMainActivity = sendDataToMainActivity;
     }
 
+    public void updateDataList(List<ItemCheckServer> dataList)
+    {
+        this.dataList = dataList;
+        notifyDataSetChanged();
+        notifyItemRangeChanged(0, this.dataList.size());
+    }
+
     public void insertItem(ItemCheckServer model)
     {
         dataList.add(model);

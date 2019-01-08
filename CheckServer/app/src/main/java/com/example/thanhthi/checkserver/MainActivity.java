@@ -49,11 +49,20 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         setTitle("Check Server");
         recyclerView = findViewById(R.id.recyclerView);
 
-        adapter = new MainAdapter(getApplicationContext(), dataList, getSupportFragmentManager(),this);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        if (adapter == null)
+        {
+            adapter = new MainAdapter(getApplicationContext(), dataList, getSupportFragmentManager(), this);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+
+            startServiceFirst();
+        }
+        else
+        {
+            adapter.updateDataList(dataList);
+        }
     }
 
     private void getData()
