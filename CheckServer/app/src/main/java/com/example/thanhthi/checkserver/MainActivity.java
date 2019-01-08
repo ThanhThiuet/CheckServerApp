@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), model.getId(), startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        assert alarmManager != null;
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
 
         startService(startIntent);
