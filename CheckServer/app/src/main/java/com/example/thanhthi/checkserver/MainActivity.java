@@ -209,4 +209,13 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         CheckServerService.repository = this.repository;
     }
+
+    @Override
+    protected void onDestroy()
+    {
+        for (ItemCheckServer item : dataList) {
+            stopCheckServer(item);
+        }
+        super.onDestroy();
+    }
 }
