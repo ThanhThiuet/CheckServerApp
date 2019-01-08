@@ -3,11 +3,9 @@ package com.example.thanhthi.checkserver.services;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.thanhthi.checkserver.data.ItemDataSource;
 import com.example.thanhthi.checkserver.data.ItemRepository;
@@ -28,9 +26,8 @@ import java.util.List;
 
 public class CheckServerService extends Service
 {
-    public static final String DATA = "data";
-
     private ItemCheckServer model;
+    private GetContentAsyntask asyntask;
 
     @Nullable
     @Override
@@ -56,11 +53,25 @@ public class CheckServerService extends Service
         }
 
         if (model != null && model.isChecking())
-            new GetContentAsyntask().execute();
+        {
+            asyntask = new GetContentAsyntask();
+            asyntask.execute();
+        }
         else
+        {
             stopSelf();
+            asyntask.cancel(false);
+        }
 
         return START_STICKY;
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        asyntask.cancel(false);
+        asyntask = null;
+        super.onDestroy();
     }
 
     private final class GetContentAsyntask extends AsyncTask<Void, Void, Boolean>
