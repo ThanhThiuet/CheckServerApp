@@ -122,6 +122,8 @@ public class ItemCheckServer
 
         if (isChecking) {
             contentValues.put(ItemContract.ItemEntry.COLUMN_IS_CHECKING, 1);
+        } else {
+            contentValues.put(ItemContract.ItemEntry.COLUMN_IS_CHECKING, 0);
         }
 
         return contentValues;

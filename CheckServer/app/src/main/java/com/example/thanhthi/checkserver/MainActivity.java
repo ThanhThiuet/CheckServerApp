@@ -186,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         long timeRepeat = (long) (1000 * 60 * model.getFrequency());
 
+        CheckServerService.repository = this.repository;
+
         // start service
         Intent startIntent = new Intent(getBaseContext(), CheckServerService.class);
         startIntent.setFlags(model.getId());
@@ -204,5 +206,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         Intent stopIntent = new Intent(getApplicationContext(), CheckServerService.class);
         stopIntent.setFlags(model.getId());
         stopService(stopIntent);
+
+        CheckServerService.repository = this.repository;
     }
 }

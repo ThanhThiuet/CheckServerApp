@@ -29,6 +29,8 @@ public class CheckServerService extends Service
     private ItemCheckServer model;
     private GetContentAsyntask asyntask;
 
+    public static ItemDataSource repository;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,7 +40,7 @@ public class CheckServerService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        ItemDataSource repository = ItemRepository.getInstance(getApplicationContext());
+//        repository = ItemRepository.getInstance(getApplicationContext());
         List<ItemCheckServer> dataList = repository.getAllItems();
 
         int idSelected = intent.getFlags();
