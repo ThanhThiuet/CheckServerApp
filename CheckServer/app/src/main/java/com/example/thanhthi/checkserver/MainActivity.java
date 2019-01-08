@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
 
         getData();
         initView();
-        startServiceFirst();
+//        startServiceFirst();
     }
 
     private void initView()
@@ -96,11 +96,11 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
                 fragmentTransaction.commit();
                 break;
             }
-            case R.id.delete:
-            {
-                // xóa nhiều
-                break;
-            }
+//            case R.id.delete:
+//            {
+//                // xóa nhiều
+//                break;
+//            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -153,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
             adapter.deleteItem(item);
             dataList = adapter.getDataList();
             Toast.makeText(this, "Xóa item " + item.getId() + " thành công!", Toast.LENGTH_SHORT).show();
+            stopCheckServer(item);
         }
         else
         {
@@ -180,10 +181,9 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
         Intent startIntent = new Intent(getBaseContext(), CheckServerService.class);
         startIntent.setFlags(model.getId());
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), model.getId(), startIntent, model.getId());
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), model.getId(), startIntent, model.getId());
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), timeRepeat, pendingIntent);
-//        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), timeRepeat, pendingIntent);
 
         startService(startIntent);
     }

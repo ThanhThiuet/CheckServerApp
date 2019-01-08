@@ -128,7 +128,6 @@ public class CheckServerService extends Service
             // show notify
             NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext(), model);
             notificationHelper.createNotification();
-            super.onPostExecute(aBoolean);
         }
     }
 }
