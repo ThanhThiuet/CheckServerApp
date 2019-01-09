@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.thanhthi.checkserver.R;
 import com.example.thanhthi.checkserver.SendDataToMainActivity;
@@ -103,6 +104,27 @@ public class UpdateItemFragment extends Fragment implements View.OnClickListener
         String keyWord = edtKeyWord.getText().toString().trim();
         String message = edtMessage.getText().toString().trim();
         Double frequency = Double.parseDouble(edtFrequency.getText().toString().trim());
+
+        if (url.isEmpty())
+        {
+            Toast.makeText(getContext(), "Please input url!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (keyWord.isEmpty())
+        {
+            Toast.makeText(getContext(), "Please input key word", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (message.isEmpty())
+        {
+            Toast.makeText(getContext(), "Please input message", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (frequency == 0.0d)
+        {
+            Toast.makeText(getContext(), "Please input frequency", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         switch(flag)
         {

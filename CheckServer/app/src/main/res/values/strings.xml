@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CheckServer</string>
 
-    <string name="notification">Thông báo</string>
-    <string name="ok">Đồng ý</string>
-    <string name="cancel">Hủy bỏ</string>
+    <string name="notification">Message</string>
+    <string name="ok">Agree</string>
+    <string name="cancel">Cancel</string>
 </resources>
