@@ -62,7 +62,6 @@ public class CheckServerService extends Service
         else
         {
             stopSelf();
-            asyntask.cancel(false);
         }
 
         return START_STICKY;
@@ -71,7 +70,6 @@ public class CheckServerService extends Service
     @Override
     public void onDestroy()
     {
-        asyntask.cancel(false);
         asyntask = null;
         super.onDestroy();
     }

@@ -116,7 +116,7 @@ public class ItemCheckServer
             contentValues.put(ItemContract.ItemEntry.COLUMN_MESSAGE, message);
         }
 
-        if (frequency != 0) {
+        if (frequency != 0.0d) {
             contentValues.put(ItemContract.ItemEntry.COLUMN_FREQUENCY, frequency);
         }
 

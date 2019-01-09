@@ -214,14 +214,16 @@ public class MainActivity extends AppCompatActivity implements SendDataToMainAct
     @Override
     protected void onDestroy()
     {
+        dataList = repository.getAllItems();
+
         for (ItemCheckServer item : dataList)
         {
-            item.setChecking(false);
-            repository.editItem(item);
-        }
-
-        for (ItemCheckServer item : dataList) {
-            stopCheckServer(item);
+            if (item.isChecking())
+            {
+                item.setChecking(false);
+                repository.editItem(item);
+                stopCheckServer(item);
+            }
         }
 
         super.onDestroy();
