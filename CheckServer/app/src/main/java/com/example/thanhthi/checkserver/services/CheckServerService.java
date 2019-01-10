@@ -1,5 +1,6 @@
 package com.example.thanhthi.checkserver.services;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -8,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.thanhthi.checkserver.data.ItemDataSource;
-import com.example.thanhthi.checkserver.data.ItemRepository;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 
 import org.apache.http.HttpResponse;
@@ -27,7 +27,8 @@ import java.util.List;
 public class CheckServerService extends Service
 {
     private ItemCheckServer model;
-    private GetContentAsyntask asyntask;
+    private GetContentAsyncTask asyncTask;
+
 
     public static ItemDataSource repository;
 
@@ -40,24 +41,26 @@ public class CheckServerService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-//        repository = ItemRepository.getInstance(getApplicationContext());
-        List<ItemCheckServer> dataList = repository.getAllItems();
-
-        int idSelected = intent.getFlags();
-
-        for (ItemCheckServer item : dataList)
+        if (repository != null)
         {
-            if (idSelected == item.getId())
+            List<ItemCheckServer> dataList = repository.getAllItems();
+
+            int idSelected = intent.getFlags();
+
+            for (ItemCheckServer item : dataList)
             {
-                model = item;
-                break;
+                if (idSelected == item.getId())
+                {
+                    model = item;
+                    break;
+                }
             }
         }
 
         if (model != null && model.isChecking())
         {
-            asyntask = new GetContentAsyntask();
-            asyntask.execute();
+            asyncTask = new GetContentAsyncTask();
+            asyncTask.execute();
         }
         else
         {
@@ -67,18 +70,14 @@ public class CheckServerService extends Service
         return START_STICKY;
     }
 
-    @Override
-    public void onDestroy()
-    {
-        asyntask = null;
-        super.onDestroy();
-    }
-
-    private final class GetContentAsyntask extends AsyncTask<Void, Void, Boolean>
+    @SuppressLint("StaticFieldLeak")
+    private final class GetContentAsyncTask extends AsyncTask<Void, Void, Boolean>
     {
         @Override
         protected Boolean doInBackground(Void... voids)
         {
+            if (model == null) return false;
+
             // get content from url
             String content = "";
             try
@@ -137,8 +136,11 @@ public class CheckServerService extends Service
         protected void onPostExecute(Boolean aBoolean)
         {
             // show notify
-            NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext(), model);
-            notificationHelper.createNotification();
+            if (aBoolean)
+            {
+                NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext(), model);
+                notificationHelper.createNotification();
+            }
         }
     }
 }
