@@ -26,10 +26,9 @@ import java.util.List;
 
 public class CheckServerService extends Service
 {
+    public static final String ID_SEND = "id";
+
     private ItemCheckServer model;
-    private GetContentAsyncTask asyncTask;
-
-
     public static ItemDataSource repository;
 
     @Nullable
@@ -38,32 +37,47 @@ public class CheckServerService extends Service
         return null;
     }
 
+    @SuppressLint("LongLogTag")
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        if (repository != null)
+        Log.e("CheckServerService_onStartCommand", "START_SERVICE");
+        Log.e("CheckServerService_onStartCommand", "repository : " + repository);
+
+        if (intent == null)
         {
-            List<ItemCheckServer> dataList = repository.getAllItems();
+            stopSelf();
+            return START_STICKY;
+        }
 
-            int idSelected = intent.getFlags();
+        int idSelected = intent.getIntExtra(ID_SEND, -1);
+        Log.e("CheckServerService_onStartCommand", "idSelected : " + idSelected);
 
-            for (ItemCheckServer item : dataList)
+        if (repository == null || repository.getAllItems().size() == 0 || idSelected == -1)
+        {
+            stopSelf(idSelected);
+            return START_STICKY;
+        }
+
+        // find item
+        List<ItemCheckServer> dataList = repository.getAllItems();
+        for (ItemCheckServer item : dataList)
+        {
+            if (idSelected == item.getId())
             {
-                if (idSelected == item.getId())
-                {
-                    model = item;
-                    break;
-                }
+                model = item;
+                break;
             }
         }
 
-        if (model != null && model.isChecking())
-        {
-            asyncTask = new GetContentAsyncTask();
-            asyncTask.execute();
+        Log.e("CheckServerService_onStartCommand", "model: " + model);
+        Log.e("CheckServerService_onStartCommand", "model id: " + model.getId());
+        Log.e("CheckServerService_onStartCommand", "model is checking: " + model.isChecking());
+
+        if (model != null && model.isChecking()) {
+            new GetContentAsyncTask().execute();
         }
-        else
-        {
+        else {
             stopSelf();
         }
 
@@ -73,10 +87,16 @@ public class CheckServerService extends Service
     @SuppressLint("StaticFieldLeak")
     private final class GetContentAsyncTask extends AsyncTask<Void, Void, Boolean>
     {
+        @SuppressLint("LongLogTag")
         @Override
         protected Boolean doInBackground(Void... voids)
         {
-            if (model == null) return false;
+            Log.e("AsyncTask_doInBackground", "START_ASYNC_TASK");
+            Log.e("AsyncTask_doInBackground", "model: " + model);
+            Log.e("AsyncTask_doInBackground", "model id: " + model.getId());
+            Log.e("AsyncTask_doInBackground", "model is checking: " + model.isChecking());
+
+            if (model == null || !model.isChecking()) return false;
 
             // get content from url
             String content = "";
@@ -87,10 +107,10 @@ public class CheckServerService extends Service
                 e.printStackTrace();
             }
             Log.e("CONTENT", content);
-            if (content.isEmpty()) return null;
+            if (content.isEmpty()) return false;
 
             // check keyword in content url
-            List<String> keyWordList = new ArrayList<>(Arrays.asList(model.getKeyWord().split(";")));
+            List<String> keyWordList = new ArrayList<>(Arrays.asList(model.getKeyWord().split(";"))); // split a string to a List<String> by ";" character
 
             boolean isContained = false;
             for (String keyWord : keyWordList)
@@ -135,6 +155,10 @@ public class CheckServerService extends Service
         @Override
         protected void onPostExecute(Boolean aBoolean)
         {
+            Log.e("AsyncTask_onPostExecute", "model: " + model);
+            Log.e("AsyncTask_onPostExecute", "model id : " + model.getId());
+            Log.e("AsyncTask_onPostExecute", "can get content html: " + aBoolean);
+
             // show notify
             if (aBoolean)
             {

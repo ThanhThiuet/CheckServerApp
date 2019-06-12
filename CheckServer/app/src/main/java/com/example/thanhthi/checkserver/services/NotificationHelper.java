@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.thanhthi.checkserver.MainActivity;
 import com.example.thanhthi.checkserver.R;
@@ -16,9 +17,6 @@ import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
 
 public class NotificationHelper
 {
-    public static final String NOTIFICATION_CHANNEL_ID = "1000";
-    public static final int requestCode = 0;
-
     private Context context;
     private NotificationManager notificationManager;
     private NotificationCompat.Builder builder;
@@ -32,6 +30,13 @@ public class NotificationHelper
 
     public void createNotification()
     {
+        Log.e("createNotification", "START_NOTIFY");
+        Log.e("createNotification", "item: " + item);
+
+        if (item == null) return;
+        Log.e("createNotification", "item id: " + item.getId());
+        Log.e("createNotification", "item is checking: " + item.isChecking());
+
         Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -50,7 +55,7 @@ public class NotificationHelper
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(Context.NOTIFICATION_SERVICE, "NOTIFICATION_CHANNEL_NAME", importance);
+            NotificationChannel notificationChannel = new NotificationChannel(Context.NOTIFICATION_SERVICE, "NOTIFICATION_CHANNEL_NAME_" + item.getId(), importance);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
