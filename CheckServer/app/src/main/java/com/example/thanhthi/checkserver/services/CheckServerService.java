@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.thanhthi.checkserver.data.ItemDataSource;
 import com.example.thanhthi.checkserver.data.model.ItemCheckServer;
@@ -164,6 +165,8 @@ public class CheckServerService extends Service
             {
                 NotificationHelper notificationHelper = new NotificationHelper(getApplicationContext(), model);
                 notificationHelper.createNotification();
+
+                Toast.makeText(getBaseContext(), "Item id " + model.getId() + " has message: " + model.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }

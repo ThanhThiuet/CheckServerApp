@@ -1,5 +1,6 @@
 package com.example.thanhthi.checkserver.services;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.example.thanhthi.checkserver.MainActivity;
@@ -19,13 +21,17 @@ public class NotificationHelper
 {
     private Context context;
     private NotificationManager notificationManager;
-    private NotificationCompat.Builder builder;
     private ItemCheckServer item;
+
+    private String CHANNEL_ID = "CheckServerApp";
+    private String CHANNEL_NAME = "Check Server App";
+    private int NOTIFICATION_ID = 0;
 
     public NotificationHelper(Context context, ItemCheckServer item)
     {
         this.context = context;
         this.item = item;
+        NOTIFICATION_ID = item.getId();
     }
 
     public void createNotification()
@@ -38,35 +44,40 @@ public class NotificationHelper
         Log.e("createNotification", "item is checking: " + item.isChecking());
 
         Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, item.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.mipmap.ic_launcher);
-        builder.setContentTitle("Message of item " + item.getId())
-                .setContentText(item.getMessage())
-                .setAutoCancel(false)
-                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
-                .setContentIntent(pendingIntent);
-
+        // notification channel
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel notificationChannel = new NotificationChannel(Context.NOTIFICATION_SERVICE, "NOTIFICATION_CHANNEL_NAME_" + item.getId(), importance);
+            NotificationChannel notificationChannel = new NotificationChannel(Context.NOTIFICATION_SERVICE, CHANNEL_NAME, importance);
             notificationChannel.enableLights(true);
             notificationChannel.setLightColor(Color.RED);
             notificationChannel.enableVibration(true);
             notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
 
             assert notificationManager != null;
-            builder.setChannelId(item.getId() + "");
             notificationManager.createNotificationChannel(notificationChannel);
         }
 
-        assert notificationManager != null;
-        notificationManager.notify(item.getId(), builder.build());
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Message of item " + item.getId())
+                .setContentTitle("Check server")
+                .setContentText(item.getMessage())
+                .setChannelId(CHANNEL_ID)
+                .setAutoCancel(false)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+                .setContentIntent(pendingIntent);
+
+        Notification notification = builder.build();
+
+//        assert notificationManager != null;
+//        notificationManager.notify(item.getId(), builder.build());
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
+        notificationManagerCompat.notify(NOTIFICATION_ID, notification);
     }
 }
